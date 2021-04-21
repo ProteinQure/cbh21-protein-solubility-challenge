@@ -1,0 +1,33 @@
+name: CBH2021 Submission
+
+on: push
+
+env:
+    BIOLIB_LOG: debug
+    LOCAL_DOCKER_TAG: cbh2021:latest
+
+jobs:
+    build-and-publish:
+        name: Build Docker image and publish if on main
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Build docker image
+                run: docker build -t $LOCAL_DOCKER_TAG .
+
+            -   name: Setup Python
+                uses: actions/setup-python@v2
+                with:
+                    python-version: 3.8.6
+
+            -   name: Install BioLib CLI
+                run: pip3 install pybiolib
+
+            -   name: Publish new version to BioLib if on main branch
+                if: github.ref == 'refs/heads/main'
+                run: biolib push $BIOLIB_PROJECT_URI --path submission
+                env:
+                    BIOLIB_PROJECT_URI: ${{ secrets.BIOLIB_PROJECT_URI }}
+                    BIOLIB_TOKEN: ${{ secrets.BIOLIB_TOKEN }}

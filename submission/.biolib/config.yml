@@ -1,0 +1,20 @@
+biolib_version: 2
+modules:
+    main:
+        image: 'local-docker://cbh2021:latest'
+        command: ''
+        working_directory: /home/biolib/
+        input_files:
+            - COPY / /home/biolib/
+        output_files:
+            - COPY /home/biolib/ /
+        source_files:
+            - COPY / /home/biolib/
+arguments:
+    -
+        default_value: 'sequences.fasta'
+        description: Sequence Input (.fasta)
+        key: '--infile'
+        key_value_separator: ' '
+        required: true
+        type: file
