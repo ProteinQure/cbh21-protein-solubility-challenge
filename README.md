@@ -1,12 +1,12 @@
-# Example Challenge
+# Challenge: Structural basis for solubility in protein expression systems
 
-This repository is a template for creating challenges. You can change this README to describe your challenge in detail.
+Large-scale protein production for biotechnology and biopharmaceutical applications rely on high protein solubility in expression systems. Solubility has been measured for a significant fraction of E. coli and S. cerevisiae proteomes and these datasets are routinely used to train predictors of protein solubility in different organisms. Thanks to continued advances in experimental structure-determination and modelling, many of these solubility measurements can now be paired with accurate structural models.
 
-The participants will fork your challenge repository at the beginning of the hackathon.
+The challenge is mentored by [Christopher Ing](https://github.com/cing) and [Mark Fingerhuth](https://github.com/markf94).
 
 ## Challenge Aim
 
-The aim of this challenge is to predict adenine amino acid count. You are given a FASTA file using the `--infile` argument. For each protein, output your prediction for the number adenine amino acids in that protein. 
+It is the objective of this project to use our provided dataset of protein structure and solubility value pairs in order to produce a solubility predictor with comparable accuracy to sequence-based predictors reported in the literature. The provided dataset to be used in this project is created by following the dataset curation procedure of SOLart, and this hackathon project has a similar aim to this manuscript. 
 
 ### Example Output
 You code should output a file called `predictions.csv` in the following format:
