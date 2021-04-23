@@ -9,7 +9,11 @@ The challenge is mentored by [Christopher Ing](https://github.com/cing) and [Mar
 
 ## Challenge Aim
 
-It is the objective of this project to use our provided dataset of protein structure and solubility value pairs in order to produce a solubility predictor with comparable accuracy to sequence-based predictors reported in the literature. The provided dataset to be used in this project is created by following the dataset curation procedure of SOLart, and this hackathon project has a similar aim to this manuscript. 
+It is the objective of this project to use our provided dataset of protein structure and solubility value pairs in order to produce a solubility predictor with comparable accuracy to sequence-based predictors reported in the literature. The provided dataset to be used in this project is created by following the dataset curation procedure described in [the SOLart paper](https://academic.oup.com/bioinformatics/article/36/5/1445/5585748), and this hackathon project has a similar aim to this manuscript.
+
+## The dataset
+
+[more info here]
 
 ### Example Output
 You code should output a file called `predictions.csv` in the following format:
