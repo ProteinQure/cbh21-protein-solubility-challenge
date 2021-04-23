@@ -13,7 +13,9 @@ It is the objective of this project to use our provided dataset of protein struc
 
 ## The dataset
 
-[more info here]
+The process of generating the dataset is described in the SOLArt manuscript. At a high level, all experimentally tested E. coli and S. cerevisiae proteins were matched through Uniprot IDs to known crystallographic structures or high sequence similarity homology models. After balancing the fold types using CATH, a dataset containing a balanced spread of solubility values was produced. The resulting proteins for the training and testing of these models were prepared and disclosed in the supplemental material of this paper as a list of (Uniprot,PDB,Chain,Solubility) pairs. The PDB files were not included in this work so we had to re-extract them from [SWISS-MODEL](ttps://swissmodel.expasy.org/https://swissmodel.expasy.org/). Whenever a crystallographic structure was present, it was used, assuming high coverage over the Uniprot sequence. In some cases, the original PDB templates used within the original SOLArt paper had been superceded by improved templates, and we opted to take the highest resolution, highest sequence identity, models in our updated dataset. We stripped away all irrelevant chains and heteroatoms.
+
+If issues are identified with individual structures, please refer to the Uniprot ID and manually investigate the best template. In some cases, we needed to improve structure correctness by modelling missing atoms/residues inside the Chemical Computing Group software MOE on a case-by-case basis.
 
 ### Example Output
 Your code should output a file called `predictions.csv` in the following format:
