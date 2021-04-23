@@ -1,5 +1,6 @@
 FROM python:3.8-slim
 WORKDIR /home/biolib
-RUN pip install numpy biopython
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 COPY predict.py .
 ENTRYPOINT ["python3", "predict.py"]
