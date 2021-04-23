@@ -16,13 +16,17 @@ It is the objective of this project to use our provided dataset of protein struc
 [more info here]
 
 ### Example Output
-You code should output a file called `predictions.csv` in the following format:
+Your code should output a file called `predictions.csv` in the following format:
 
 ```
 protein,solubility
 P69829,83
 P31133,62
 ```
+
+whereby the `protein` column contains the Uniprot ID (corresponds to the filename of the PDB files) and the `solubility` column contains the predicted solubility value (can be `int` or `float`).
+
+Note, that there are three (!) test subsets but you are expected to submit all the predictions in one file (not three) for the benchmarking system to work.
 
 ## Benchmarking System
 The continuous integration script in `.github/workflows/ci.yml` will automatically build the `Dockerfile` on every commit to the `main` branch. This docker image will be published as your hackathon submission to `https://biolib.com/<YourTeam>/<TeamName>`. For this to work, make sure you set the `BIOLIB_TOKEN` and `BIOLIB_PROJECT_URI` accordingly as repository secrets. 
