@@ -19,9 +19,9 @@ It is the objective of this project to use our provided dataset of protein struc
 You code should output a file called `predictions.csv` in the following format:
 
 ```
-name,prediction
-prot1,2
-prot2,6
+protein,solubility
+P69829,83
+P31133,62
 ```
 
 ## Benchmarking System
