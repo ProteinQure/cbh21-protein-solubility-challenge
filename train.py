@@ -6,6 +6,7 @@ import pandas as pd
 import glob
 import csv
 import pickle
+import freesasa
 
 
 # train the random forrest with training data
