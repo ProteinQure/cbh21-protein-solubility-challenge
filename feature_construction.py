@@ -5,6 +5,8 @@ import glob
 import numpy as np
 import pandas as pd
 from calc_fractions import *
+from Bio.SeqUtils.IsoelectricPoint import IsoelectricPoint as IP
+from Bio.PDB.Polypeptide import PPBuilder
 
 def calc_length(filenames):
 
@@ -119,6 +121,31 @@ def ss_depth(filenames):
     return frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list
 
 
+def iso_point(filenames):
+    """Funciton that calculats the isoelectric point of a list of proteins"""
+    prot_charge = []
+    pi = []
+
+    #for file in glob.glob("data/training/crystal_structs/*.pdb"):
+    for file in filenames:
+
+        # parse the pdb file
+        p = PDB.PDBParser(QUIET=True)
+        s = p.get_structure(file, file)
+
+        PolypeptideBuilder = PPBuilder()
+
+        for pp in PolypeptideBuilder.build_peptides(s):
+            query_chain = pp.get_sequence()
+
+        protein = IP(query_chain)
+
+        prot_charge.append(protein.charge_at_pH(7.0))
+        pi.append(protein.pi())
+
+    return prot_charge, pi
+
+
 def compute_features(filenames, save=False):
     """"Takes list of pdb filenames as input and returns list of features"""
 
@@ -141,6 +168,10 @@ def compute_features(filenames, save=False):
     print("Calculating Secondary Structure")
     frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list = ss_depth(filenames)
 
+    ###### Isoelectron point and overall charge
+    print("Calculating Isoelecric point and charge of sequence")
+    prot_charges, pis = iso_point(filenames)
+
     ###### Fractions of Negative and Positive
     print("Calculating Fractions of Negative and Positive")
     feats=feat_list(filenames)
@@ -155,7 +186,8 @@ def compute_features(filenames, save=False):
     # Save features in file to pass to R script
     print("Saving features")
     arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list,
-                           frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg,exp_score))
+                           frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg,exp_score,
+                           prot_charges, pis))
 
     df = pd.DataFrame({'protIDs': protIDs, 
         'surfaces': surfaces,
@@ -169,7 +201,9 @@ def compute_features(filenames, save=False):
         'frac_pos': frac_pos, 
         'frac_charged': frac_charged, 
         'pos_minus_neg': pos_minus_neg,
-        'exp_score': exp_score})
+        'exp_score': exp_score,
+        'iso_point': pis,
+        'charge': prot_charges})
 
     if save:
         # np.savetxt("features.csv", arr, delimiter=",")
