@@ -145,16 +145,17 @@ def compute_features(filenames, save=False):
     print("Calculating Fractions of Negative and Positive")
     feats=feat_list(filenames)
     # turn list of tuples into tuple of lists
-    frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg= ([a for a,b,c,d,e in feats],
-                                                                      [b for a,b,c,d,e in feats],
-                                                                      [c for a,b,c,d,e in feats],
-                                                                      [d for a,b,c,d,e in feats],
-                                                                      [e for a,b,c,d,e in feats])
+    frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg, exp_score= ([a for a,b,c,d,e,f in feats],
+                                                                      [b for a,b,c,d,e,f in feats],
+                                                                      [c for a,b,c,d,e,f in feats],
+                                                                      [d for a,b,c,d,e,f in feats],
+                                                                      [e for a,b,c,d,e,f in feats],
+                                                                        [f for a,b,c,d,e,f in feats])
 
     # Save features in file to pass to R script
     print("Saving features")
     arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list,
-                           frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg))
+                           frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg,exp_score))
 
     df = pd.DataFrame({'protIDs': protIDs, 
         'surfaces': surfaces,
@@ -167,7 +168,8 @@ def compute_features(filenames, save=False):
         'frac_neg': frac_neg, 
         'frac_pos': frac_pos, 
         'frac_charged': frac_charged, 
-        'pos_minus_neg': pos_minus_neg})
+        'pos_minus_neg': pos_minus_neg,
+        'exp_score': exp_score})
 
     if save:
         # np.savetxt("features.csv", arr, delimiter=",")
