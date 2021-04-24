@@ -18,4 +18,4 @@ RUN pip install freesasa atomium temppathlib
 
 # copy all the code
 COPY . .
-#ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "myenv", "python3", "predict.py"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "myenv", "python3", "predict.py"]
