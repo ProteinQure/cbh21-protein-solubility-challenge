@@ -7,6 +7,7 @@ import pandas as pd
 from calc_fractions import *
 from Bio.SeqUtils.IsoelectricPoint import IsoelectricPoint as IP
 from Bio.PDB.Polypeptide import PPBuilder
+import atomium
 
 def calc_length(filenames):
 
@@ -145,6 +146,17 @@ def iso_point(filenames):
 
     return prot_charge, pi
 
+
+def radius_of_giration(filenames):
+    """Calculates the radius of gyration of each pdb structure and returns a list with all radii."""
+    
+    rg_list = []
+    for filename in filenames:
+        pdb = atomium.open(filename)
+        rg = pdb.model.radius_of_gyration
+        rg_list.append(rg)
+    
+    return rg_list
 
 def compute_features(filenames, save=False):
     """"Takes list of pdb filenames as input and returns list of features"""
