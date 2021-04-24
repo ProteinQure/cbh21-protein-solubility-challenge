@@ -5,6 +5,7 @@ import glob
 from Bio.PDB.DSSP import dssp_dict_from_pdb_file
 
 def get_feats(file):
+    '''Given a protein name ('file'), will extract features related to amino acid charges'''
 
     alphas=['H','I','G']
     betas=['B','E']
@@ -28,7 +29,7 @@ def get_feats(file):
 
 
     len_prot=len(dssp_dict)
-
+    '''
     # looking at beta residues:
     tot_bet_bur=0
     tot_bet_mod = 0
@@ -73,7 +74,7 @@ def get_feats(file):
         al_exp=(tot_al_exp / alph_frac)
     except:
         al_exp='NA'
-
+    '''
 
     # calc fraction of each of the 20 amino acid types
     aas={}
@@ -128,6 +129,21 @@ def get_feats(file):
     # fraction of positively minus negatively charged residues
     pos_minus_neg=frac_pos-frac_neg
 
+    # scores how hydrophobic the surface is (-1 for every hydrophobic amino acid, normalised by protein size)
+    hydrophobes=['A','V','I','L','M','F','Y','W']
+    exp_score=0
+    exp_count=0
+    for amino_acid in all_residues:
+        RASA = dssp_dict[amino_acid][2]
+        if RASA>150:
+            exp_count+=1
+            if dssp_dict[amino_acid][0] in hydrophobes:
+                exp_score+=-1
+    try:
+        exp_score=exp_score/exp_count
+    except:
+        exp_score=0
+
     fracs=(#bet_bur,
                 #bet_mod,
                 #al_mod,
@@ -137,7 +153,8 @@ def get_feats(file):
                 frac_neg,
                 frac_pos,
                 frac_charged,
-                pos_minus_neg)
+                pos_minus_neg,
+                exp_score)
 
     return(fracs)
 

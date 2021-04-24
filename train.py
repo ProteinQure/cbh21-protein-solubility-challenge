@@ -13,10 +13,10 @@ import freesasa
 
 filenames = glob.glob("data/training/crystal_structs/*.pdb")
 
-# features = compute_features(filenames)
+features = compute_features(filenames)
 
 # features = np.load('features.npy')
-features = pd.read_csv('features.csv')
+# features = pd.read_csv('features.csv')
 features = features.sort_values('protIDs').reset_index(drop=True)
 
 solubility = pd.read_csv("data/training/crystal_structs/solubility_values.csv")
