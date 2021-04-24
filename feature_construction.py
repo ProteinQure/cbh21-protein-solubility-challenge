@@ -4,6 +4,7 @@ import Bio.PDB.DSSP as DSSP
 import glob
 import numpy as np
 import pandas as pd
+from calc_fractions import *
 
 def calc_length(filenames):
 
@@ -140,16 +141,27 @@ def compute_features(filenames, save=False):
     print("Calculating Secondary Structure")
     frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list = ss_depth(filenames)
 
+    ###### Fractions of Negative and Positive
+    print("Calculating Fractions of Negative and Positive")
+    frac_k_minus_r,frac_neg,frac_pos,frac_charged,pos_minus_neg=get_feats(filename)
+
     # Save features in file to pass to R script
     print("Saving features")
-    arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list))
+    arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list,
+                           frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg))
+
     df = pd.DataFrame({'protIDs': protIDs, 
         'surfaces': surfaces,
         'prot_lengths': prot_lengths,
         'surface_seq': surface_seq,
         'frac_mod_beta_list': frac_mod_beta_list,
         'frac_mod_alfa_list': frac_mod_alfa_list,
-        'frac_exp_alfa_list': frac_exp_alfa_list})
+        'frac_exp_alfa_list': frac_exp_alfa_list,
+        'frac_k_minus_r': frac_k_minus_r, 
+        'frac_neg': frac_neg, 
+        'frac_pos': frac_pos, 
+        'frac_charged': frac_charged, 
+        'pos_minus_neg': pos_minus_neg})
 
     if save:
         # np.savetxt("features.csv", arr, delimiter=",")
