@@ -32,12 +32,13 @@ The features we investigated in described below;
 * Fraction of K residues minus the fraction of R residues.   
 * Fraction of negativly charged residues. 
 * Fraction of positivly charged residues.  
-* Fraction of charged residues
+* Fraction of charged residues.
 * Fraction of positively minus negatively
 charged residues.
 * Score on how hydrophobic the surface is (-1 for every hydrophobic amino acid, normalised by protein size).
 * Isoelectric point. 
 * Charge of protein at pH 7. 
 * Count of aromatic residues.
+* Fraction of aromatic residues.
 * The aromaticity of the protein
 * Molecular weights in kDa. 

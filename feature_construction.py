@@ -198,7 +198,11 @@ def compute_features(filenames, save=False):
     #print("Calculating Isoelecric point and charge of sequence")
     prot_charges, pis, aromatic_counts, aromaticitys, weights = iso_point(filenames)
 
-    
+    ###### Fraction of aromatic residues
+    frac_arom = []
+    for i in range(len(aromatic_counts)):
+        frac_arom.append(aromatic_counts / prot_lengths)
+
     ###### Radius of gyration
     
     # print("Calculating radius of gyration")
@@ -219,7 +223,7 @@ def compute_features(filenames, save=False):
     #print("Saving features")
     arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list,
                            frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg,exp_score,
-                           prot_charges, pis, aromatic_counts, aromaticitys, weights))
+                           prot_charges, pis, aromatic_counts, aromaticitys, weights, frac_arom))
 
 
     df = pd.DataFrame({'protIDs': protIDs, 
@@ -238,6 +242,7 @@ def compute_features(filenames, save=False):
         'iso_point': pis,
         'charge': prot_charges,
         'aromatic_counts': aromatic_counts,
+        'aromatic_fracs': frac_arom,
         'aromaticitys': aromaticitys,
         'weights': weights,
         'radius': radius})
