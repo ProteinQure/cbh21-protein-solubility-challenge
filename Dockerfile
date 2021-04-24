@@ -5,5 +5,3 @@ RUN pip install -r requirements.txt
 COPY predict.py .
 COPY data/test.zip data/
 ENTRYPOINT ["python3", "predict.py"]
-
-RUN R -e "install.packages(c('caret', 'doMC', 'tidyverse',''), dependecties = TRUE)" 
