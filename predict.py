@@ -43,7 +43,7 @@ def predict(pdb_file: Path) -> float:
     features = compute_features([str(pdb_file)])
     XTest = features.iloc[:, 1:].to_numpy()
 
-    predicted_solubility = rfr.predict(XTest)
+    predicted_solubility = rfr.predict(XTest)[0]
 
     return predicted_solubility
 
