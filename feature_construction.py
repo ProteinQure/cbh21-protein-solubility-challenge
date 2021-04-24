@@ -201,7 +201,7 @@ def compute_features(filenames, save=False):
     ###### Fraction of aromatic residues
     frac_arom = []
     for i in range(len(aromatic_counts)):
-        frac_arom.append(aromatic_counts / prot_lengths)
+        frac_arom.append(aromatic_counts[i]/prot_lengths[i])
 
     ###### Radius of gyration
     

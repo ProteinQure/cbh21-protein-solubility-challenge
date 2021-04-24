@@ -6,7 +6,7 @@ Our team is from Copenhagen and we think proteins are cool 🙌.
 
 ## Project Description
 
-Our team aimed to create a model to predict protein solubility. We used a random forest with a selected assortment of features. 
+Our team aimed to create a model to predict protein solubility. We used a random forest and trained it with a selected assortment of features. 
 
 ## Team Members
 
