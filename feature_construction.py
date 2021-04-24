@@ -141,12 +141,23 @@ def iso_point(filenames):
         for pp in PolypeptideBuilder.build_peptides(s):
             query_chain = pp.get_sequence()
 
+        # calculate iso-electric point etc.
         protein = IP(query_chain)
-
         prot_charge.append(protein.charge_at_pH(7.0))
         pi.append(protein.pi())
 
-    return prot_charge, pi
+        # calculate molecular weight
+        X = ProteinAnalysis(str(query_chain))
+        # print(str(query_chain) + "\n")
+        aromatic_count.append(X.count_amino_acids()['F'] + X.count_amino_acids()['W'] + X.count_amino_acids()['Y'])
+
+        # Calculate aromaticity
+        aromaticity.append(X.aromaticity())
+
+        # molecular weight
+        weight.append(X.molecular_weight())
+
+    return prot_charge, pi, aromatic_count, aromaticity, weight
 
 
 def compute_features(filenames, save=False):
@@ -173,7 +184,7 @@ def compute_features(filenames, save=False):
 
     ###### Isoelectron point and overall charge
     #print("Calculating Isoelecric point and charge of sequence")
-    prot_charges, pis = iso_point(filenames)
+    prot_charges, pis, aromatic_counts, aromaticitys, weights = iso_point(filenames)
 
     ###### Fractions of Negative and Positive
     #print("Calculating Fractions of Negative and Positive")
@@ -190,7 +201,7 @@ def compute_features(filenames, save=False):
     #print("Saving features")
     arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list,
                            frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg,exp_score,
-                           prot_charges, pis))
+                           prot_charges, pis, aromatic_counts, aromaticitys, weights))
 
     df = pd.DataFrame({'protIDs': protIDs, 
         'surfaces': surfaces,
@@ -206,7 +217,10 @@ def compute_features(filenames, save=False):
         'pos_minus_neg': pos_minus_neg,
         'exp_score': exp_score,
         'iso_point': pis,
-        'charge': prot_charges})
+        'charge': prot_charges,
+        'aromatic_counts': aromatic_counts,
+        'aromaticitys': aromaticitys,
+        'weights': weights})
 
     if save:
         # np.savetxt("features.csv", arr, delimiter=",")
