@@ -145,7 +145,13 @@ def compute_features(filenames):
 
     ###### Fractions of Negative and Positive
     print("Calculating Fractions of Negative and Positive")
-    frac_k_minus_r,frac_neg,frac_pos,frac_charged,pos_minus_neg=get_feats(filename)
+    feats=feat_list(filenames)
+    # turn list of tuples into tuple of lists
+    frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg= ([a for a,b,c,d,e in feats],
+                                                                      [b for a,b,c,d,e in feats],
+                                                                      [c for a,b,c,d,e in feats],
+                                                                      [d for a,b,c,d,e in feats],
+                                                                      [e for a,b,c,d,e in feats])
 
     # Save features in file to pass to R script
     print("Saving features")

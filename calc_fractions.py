@@ -27,7 +27,7 @@ def get_feats(file):
             bet_frac+=1
 
 
-    len_prot=len(dssp_info)
+    len_prot=len(dssp_dict)
 
     # looking at beta residues:
     tot_bet_bur=0
