@@ -35,7 +35,7 @@ y = solubility.iloc[:, 1:].to_numpy()
 XTrain, XTest, YTrain, YTest = train_test_split(
     X, y, test_size=0.33, random_state=42)
 
-rfr = RandomForestRegressor(n_estimators=500)
+rfr = RandomForestRegressor(n_estimators=500) #
 rfr.fit(XTrain, YTrain)
 rfr_prediction = rfr.predict(XTest)
 
