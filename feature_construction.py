@@ -220,7 +220,7 @@ def compute_features(filenames, save=False):
         'pos_minus_neg': pos_minus_neg,
         'exp_score': exp_score,
         'iso_point': pis,
-        'charge': prot_charges
+        'charge': prot_charges,
         'radius': radius})
 
     if save:
