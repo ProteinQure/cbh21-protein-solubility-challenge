@@ -7,6 +7,7 @@ import pandas as pd
 from calc_fractions import *
 from Bio.SeqUtils.IsoelectricPoint import IsoelectricPoint as IP
 from Bio.PDB.Polypeptide import PPBuilder
+from Bio.SeqUtils.ProtParam import ProteinAnalysis
 
 def calc_length(filenames):
 
@@ -125,8 +126,10 @@ def iso_point(filenames):
     """Funciton that calculats the isoelectric point of a list of proteins"""
     prot_charge = []
     pi = []
+    aromatic_count = []
+    aromaticity = []
+    weight = []
 
-    #for file in glob.glob("data/training/crystal_structs/*.pdb"):
     for file in filenames:
 
         # parse the pdb file
@@ -153,27 +156,27 @@ def compute_features(filenames, save=False):
     protIDs = [filename.split('/')[-1].split('.pdb')[0] for filename in filenames]
     
     ###### Protein Sequence Length
-    print('Calculating Protein Sequence Length')
+    #print('Calculating Protein Sequence Length')
     prot_lengths = calc_length(filenames)
 
     ###### Surface Area
-    print("Calculating Surface Area")
+    #print("Calculating Surface Area")
     surfaces = calc_surface(filenames)
 
     ###### Relative Surface Area
-    print("Calculating Relative Surface Area")
+    #print("Calculating Relative Surface Area")
     surface_seq = [surfaces[i] / prot_lengths[i] for i in range(len(surfaces))]
 
     ###### Secondary Structure
-    print("Calculating Secondary Structure")
+    #print("Calculating Secondary Structure")
     frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list = ss_depth(filenames)
 
     ###### Isoelectron point and overall charge
-    print("Calculating Isoelecric point and charge of sequence")
+    #print("Calculating Isoelecric point and charge of sequence")
     prot_charges, pis = iso_point(filenames)
 
     ###### Fractions of Negative and Positive
-    print("Calculating Fractions of Negative and Positive")
+    #print("Calculating Fractions of Negative and Positive")
     feats=feat_list(filenames)
     # turn list of tuples into tuple of lists
     frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg, exp_score= ([a for a,b,c,d,e,f in feats],
@@ -184,7 +187,7 @@ def compute_features(filenames, save=False):
                                                                         [f for a,b,c,d,e,f in feats])
 
     # Save features in file to pass to R script
-    print("Saving features")
+    #print("Saving features")
     arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list,
                            frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg,exp_score,
                            prot_charges, pis))
