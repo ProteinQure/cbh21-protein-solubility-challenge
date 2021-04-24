@@ -3,6 +3,7 @@ import Bio.PDB as PDB
 import Bio.PDB.DSSP as DSSP 
 import glob
 import numpy as np
+from calc_fractions import *
 
 def calc_length(filenames):
 
@@ -117,6 +118,9 @@ def ss_depth(filenames):
     return frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list
 
 
+
+
+
 def compute_features(filenames):
     """"Takes list of pdb filenames as input and returns list of features"""
 
@@ -139,9 +143,14 @@ def compute_features(filenames):
     print("Calculating Secondary Structure")
     frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list = ss_depth(filenames)
 
+    ###### Fractions of Negative and Positive
+    print("Calculating Fractions of Negative and Positive")
+    frac_k_minus_r,frac_neg,frac_pos,frac_charged,pos_minus_neg=get_feats(filename)
+
     # Save features in file to pass to R script
     print("Saving features")
-    arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list))
+    arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list,
+                           frac_exp_alfa_list,frac_k_minus_r,frac_neg,frac_pos,frac_charged,pos_minus_neg))
 
     print(arr)
     np.savetxt("features.csv", arr, delimiter=",")

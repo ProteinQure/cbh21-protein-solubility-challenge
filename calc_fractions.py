@@ -122,18 +122,18 @@ def get_feats(file):
     # fraction of positively minus negatively charged residues
     pos_minus_neg=frac_pos-frac_neg
 
-    list_fracs=[bet_bur,
-                bet_mod,
-                al_mod,
-                al_exp,
+    fracs=(#bet_bur,
+                #bet_mod,
+                #al_mod,
+                #al_exp,
                 #aas,
                 frac_k_minus_r,
                 frac_neg,
                 frac_pos,
                 frac_charged,
-                pos_minus_neg]
+                pos_minus_neg)
 
-    return(list_fracs)
+    return(fracs)
 
 def feat_list(list_of_proteins):
     list_feats=[]
