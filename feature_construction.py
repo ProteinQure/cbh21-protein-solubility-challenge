@@ -183,6 +183,11 @@ def compute_features(filenames, save=False):
     ###### Isoelectron point and overall charge
     print("Calculating Isoelecric point and charge of sequence")
     prot_charges, pis = iso_point(filenames)
+    
+    ###### Radius of gyration
+    
+    print("Calculating radius of gyration")
+    radius = radius_of_giration(filenames)
 
     ###### Fractions of Negative and Positive
     print("Calculating Fractions of Negative and Positive")
@@ -199,7 +204,7 @@ def compute_features(filenames, save=False):
     print("Saving features")
     arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list,
                            frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg,exp_score,
-                           prot_charges, pis))
+                           prot_charges, pis, radius))
 
     df = pd.DataFrame({'protIDs': protIDs, 
         'surfaces': surfaces,
@@ -215,7 +220,8 @@ def compute_features(filenames, save=False):
         'pos_minus_neg': pos_minus_neg,
         'exp_score': exp_score,
         'iso_point': pis,
-        'charge': prot_charges})
+        'charge': prot_charges
+        'radius': radius})
 
     if save:
         # np.savetxt("features.csv", arr, delimiter=",")
