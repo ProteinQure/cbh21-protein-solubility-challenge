@@ -1,7 +1,19 @@
-FROM python:3.8-slim
+FROM fedora:33
+
+# install python toolchain
+RUN sudo dnf install conda python3 python3-devel python3-pip -y
+
+# install build toolchain
+RUN sudo dnf install gcc -y
+
 WORKDIR /home/biolib
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY predict.py .
-COPY data/test.zip data/
-ENTRYPOINT ["python3", "predict.py"]
+
+# setup conda
+COPY conda-environment.yaml .
+RUN conda env create -f conda-environment.yaml
+
+SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
+
+# copy all the code
+COPY . .
+#ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "myenv", "python3", "predict.py"]
