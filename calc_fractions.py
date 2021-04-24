@@ -11,6 +11,8 @@ def get_feats(file):
 
     list_bet_bur=[]
     list_bet_mod = []
+    list_al_mod=[]
+    list_al_exp = []
 
     dssp_tuple = dssp_dict_from_pdb_file(file)
     dssp_dict = dssp_tuple[0]
@@ -26,8 +28,7 @@ def get_feats(file):
 
     len_prot=len(dssp_info)
 
-
-
+    # looking at beta residues:
     tot_bet_bur=0
     tot_bet_mod = 0
     for amino_acid in all_residues:
@@ -40,25 +41,26 @@ def get_feats(file):
                 tot_bet_mod += 1
 
     # calculate fraction of buried beta residues, append to list
-    list_bet_bur.append(tot_bet_bur/len_prot)
+    bet_bur=tot_bet_bur/len_prot
     # calculate fraction of moderately buried beta residues, append to list
-    list_bet_mod.append(tot_bet_mod / len_prot)
+    bet_mod=(tot_bet_mod / len_prot)
 
+    # looking at alpha residues:
+    tot_al_mod = 0
+    tot_al_exp = 0
+    for amino_acid in all_residues:
+        ss = dssp_dict[amino_acid][1]
+        RASA = dssp_dict[amino_acid][2]
+        if ss == 'H':
+            if RASA > 150:
+                tot_al_exp += 1
+            elif 100 < RASA < 150:
+                tot_al_mod += 1
+        # calculate fraction of moderately buried alpha residues, append to list
+        al_mod=(tot_al_mod / len_prot)
+        # calculate fraction of moderately buried beta residues, append to list
+        al_exp=(tot_al_exp / len_prot)
 
-
-
-
-
-
-
-
-
-
-
-
-    # calc fraction of moderately buried alfa residues
-
-    # calc fraction of exposed a residues
 
     # calc fraction of each of the 20 amino acid types
 
@@ -70,8 +72,11 @@ def get_feats(file):
 
     # fraction of positively minus negatively charged residues
 
-
-
+    list_fracs=[bet_bur,
+                      bet_mod,
+                      al_mod,
+                      al_exp]
+    print(list_fracs)
     return(list_fracs)
 
 for file in glob.glob("data/training/crystal_structs/*.pdb"):
