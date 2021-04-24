@@ -64,15 +64,15 @@ def get_feats(file):
             elif 100 < RASA < 150:
                 tot_al_mod += 1
         # calculate fraction of moderately buried alpha residues, append to list
-        try:
-            al_mod=(tot_al_mod / alph_frac)
-        except:
-            al_mod=0
-        # calculate fraction of moderately buried beta residues, append to list
-        try:
-            al_exp=(tot_al_exp / alph_frac)
-        except:
-            al_exp=0
+    try:
+        al_mod=(tot_al_mod / alph_frac)
+    except:
+        al_mod=0
+    # calculate fraction of moderately buried beta residues, append to list
+    try:
+        al_exp=(tot_al_exp / alph_frac)
+    except:
+        al_exp='NA'
 
 
     # calc fraction of each of the 20 amino acid types
@@ -90,7 +90,13 @@ def get_feats(file):
     try:
         frac_k_minus_r=aas['K']-aas['R']
     except:
-        frac_k_minus_r=0
+        try:
+            frac_k_minus_r = -aas['R']
+        except:
+            try:
+                frac_k_minus_r = aas['K']
+            except:
+                frac_k_minus_r = 'NA'
 
     # fraction of negatively charged residues
     negs=['D','E']
