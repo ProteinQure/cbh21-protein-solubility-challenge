@@ -8,6 +8,7 @@ from calc_fractions import *
 from Bio.SeqUtils.IsoelectricPoint import IsoelectricPoint as IP
 from Bio.PDB.Polypeptide import PPBuilder
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
+import atomium
 
 def calc_length(filenames):
 
@@ -160,6 +161,17 @@ def iso_point(filenames):
     return prot_charge, pi, aromatic_count, aromaticity, weight
 
 
+def radius_of_giration(filenames):
+    """Calculates the radius of gyration of each pdb structure and returns a list with all radii."""
+    
+    rg_list = []
+    for filename in filenames:
+        pdb = atomium.open(filename)
+        rg = pdb.model.radius_of_gyration
+        rg_list.append(rg)
+    
+    return rg_list
+
 def compute_features(filenames, save=False):
     """"Takes list of pdb filenames as input and returns list of features"""
 
@@ -186,6 +198,12 @@ def compute_features(filenames, save=False):
     #print("Calculating Isoelecric point and charge of sequence")
     prot_charges, pis, aromatic_counts, aromaticitys, weights = iso_point(filenames)
 
+    
+    ###### Radius of gyration
+    
+    # print("Calculating radius of gyration")
+    radius = radius_of_giration(filenames)
+
     ###### Fractions of Negative and Positive
     #print("Calculating Fractions of Negative and Positive")
     feats=feat_list(filenames)
@@ -202,6 +220,7 @@ def compute_features(filenames, save=False):
     arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list,
                            frac_exp_alfa_list, frac_k_minus_r, frac_neg, frac_pos, frac_charged, pos_minus_neg,exp_score,
                            prot_charges, pis, aromatic_counts, aromaticitys, weights))
+
 
     df = pd.DataFrame({'protIDs': protIDs, 
         'surfaces': surfaces,
@@ -220,7 +239,9 @@ def compute_features(filenames, save=False):
         'charge': prot_charges,
         'aromatic_counts': aromatic_counts,
         'aromaticitys': aromaticitys,
-        'weights': weights})
+        'weights': weights,
+        'radius': radius})
+
 
     if save:
         # np.savetxt("features.csv", arr, delimiter=",")

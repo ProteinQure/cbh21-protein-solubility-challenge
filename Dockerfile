@@ -14,8 +14,8 @@ RUN conda env create -f conda-environment.yaml
 
 SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
 
-RUN pip install freesasa atomium
+RUN pip install freesasa atomium temppathlib
 
 # copy all the code
 COPY . .
-#ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "myenv", "python3", "predict.py"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "myenv", "python3", "predict.py"]
