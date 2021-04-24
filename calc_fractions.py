@@ -140,8 +140,13 @@ def get_feats(file):
                 frac_charged,
                 pos_minus_neg]
 
-    print(list_fracs)
     return(list_fracs)
 
-for file in glob.glob("data/training/crystal_structs/*.pdb"):
-    get_feats(file)
+def feat_list(list_of_proteins):
+    list_feats=[]
+    for file in list_of_proteins:
+        feats=get_feats(file)
+        list_feats.append(feats)
+    return(list_feats)
+
+# list_prots=glob.glob("data/training/crystal_structs/*.pdb")
