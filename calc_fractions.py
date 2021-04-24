@@ -6,6 +6,9 @@ from Bio.PDB.DSSP import dssp_dict_from_pdb_file
 
 def get_feats(file):
 
+    alphas=['H','I','G']
+    betas=['B','E']
+
     p = PDB.PDBParser(QUIET=True)
     structure = p.get_structure(file, file)
 
@@ -21,6 +24,16 @@ def get_feats(file):
 
     dssp_info = [dssp_dict[i] for i in all_residues]
 
+    alph_frac=0
+    bet_frac=0
+    for amino_acid in all_residues:
+        ss = dssp_dict[amino_acid][1]
+        if ss in alphas:
+            alph_frac+=1
+        if ss in betas:
+            bet_frac+=1
+
+
     len_prot=len(dssp_info)
 
     # looking at beta residues:
@@ -29,16 +42,22 @@ def get_feats(file):
     for amino_acid in all_residues:
         ss=dssp_dict[amino_acid][1]
         RASA=dssp_dict[amino_acid][2]
-        if ss=='B' or ss=='E':
+        if ss in betas:
             if RASA<100:
                 tot_bet_bur+=1
             elif RASA<150:
                 tot_bet_mod += 1
 
     # calculate fraction of buried beta residues, append to list
-    bet_bur=tot_bet_bur/len_prot
+    try:
+        bet_bur=tot_bet_bur/bet_frac
+    except:
+        bet_bur=0
     # calculate fraction of moderately buried beta residues, append to list
-    bet_mod=(tot_bet_mod / len_prot)
+    try:
+        bet_mod=(tot_bet_mod/bet_frac)
+    except:
+        bet_mod=0
 
     # looking at alpha residues:
     tot_al_mod = 0
@@ -46,15 +65,21 @@ def get_feats(file):
     for amino_acid in all_residues:
         ss = dssp_dict[amino_acid][1]
         RASA = dssp_dict[amino_acid][2]
-        if ss == 'H':
+        if ss in alphas:
             if RASA > 150:
                 tot_al_exp += 1
             elif 100 < RASA < 150:
                 tot_al_mod += 1
         # calculate fraction of moderately buried alpha residues, append to list
-        al_mod=(tot_al_mod / len_prot)
+        try:
+            al_mod=(tot_al_mod / alph_frac)
+        except:
+            al_mod=0
         # calculate fraction of moderately buried beta residues, append to list
-        al_exp=(tot_al_exp / len_prot)
+        try:
+            al_exp=(tot_al_exp / alph_frac)
+        except:
+            al_exp=0
 
 
     # calc fraction of each of the 20 amino acid types
@@ -69,21 +94,52 @@ def get_feats(file):
         aas[aa]=aas[aa]/len_prot
 
     # calc fraction of K minus fraction of R
-    frac_k_minus_r=aas['K']-aas['R']
+    try:
+        frac_k_minus_r=aas['K']-aas['R']
+    except:
+        frac_k_minus_r=0
 
     # fraction of negatively charged residues
+    negs=['D','E']
+    frac_neg=0
+    for neg in negs:
+        try:
+            frac_neg+=aas[neg]/len_prot
+        except:
+            pass
 
+    # fraction of positively charged residues
+    poss=['K','H','R']
+    frac_pos=0
+    for pos in poss:
+        try:
+            frac_pos+=aas[pos]/len_prot
+        except:
+            pass
 
     # fraction of charged residues
+    charged=['D','E','K','H','R']
+    frac_charged = 0
+    for ch in charged:
+        try:
+            frac_charged += aas[ch] / len_prot
+        except:
+            pass
 
     # fraction of positively minus negatively charged residues
+    pos_minus_neg=frac_pos-frac_neg
 
     list_fracs=[bet_bur,
-                      bet_mod,
-                      al_mod,
-                      al_exp,
-                aas,
-                frac_k_minus_r]
+                bet_mod,
+                al_mod,
+                al_exp,
+                #aas,
+                frac_k_minus_r,
+                frac_neg,
+                frac_pos,
+                frac_charged,
+                pos_minus_neg]
+
     print(list_fracs)
     return(list_fracs)
 
