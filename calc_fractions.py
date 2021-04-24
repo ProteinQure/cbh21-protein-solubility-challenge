@@ -5,14 +5,9 @@ import glob
 from Bio.PDB.DSSP import dssp_dict_from_pdb_file
 
 def get_feats(file):
+
     p = PDB.PDBParser(QUIET=True)
     structure = p.get_structure(file, file)
-    list_fracs=[]
-
-    list_bet_bur=[]
-    list_bet_mod = []
-    list_al_mod=[]
-    list_al_exp = []
 
     dssp_tuple = dssp_dict_from_pdb_file(file)
     dssp_dict = dssp_tuple[0]
@@ -63,10 +58,21 @@ def get_feats(file):
 
 
     # calc fraction of each of the 20 amino acid types
+    aas={}
+    for amino_acid in all_residues:
+        aa = dssp_dict[amino_acid][0]
+        if aa in aas.keys():
+            aas[aa]+=1
+        else:
+            aas[aa]=0
+    for aa in aas.keys():
+        aas[aa]=aas[aa]/len_prot
 
     # calc fraction of K minus fraction of R
+    frac_k_minus_r=aas['K']-aas['R']
 
     # fraction of negatively charged residues
+
 
     # fraction of charged residues
 
@@ -75,7 +81,9 @@ def get_feats(file):
     list_fracs=[bet_bur,
                       bet_mod,
                       al_mod,
-                      al_exp]
+                      al_exp,
+                aas,
+                frac_k_minus_r]
     print(list_fracs)
     return(list_fracs)
 
