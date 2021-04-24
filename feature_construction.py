@@ -5,6 +5,8 @@ import glob
 import numpy as np
 import pandas as pd
 from calc_fractions import *
+from Bio.SeqUtils.IsoelectricPoint import IsoelectricPoint as IP
+from Bio.PDB.Polypeptide import PPBuilder
 
 def calc_length(filenames):
 
@@ -117,6 +119,30 @@ def ss_depth(filenames):
             frac_exp_alfa_list.append(frac_exp_alfa)
 
     return frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list
+
+
+def iso_point(filenames):
+    """Funciton that calculats the isoelectric point of a list of proteins"""
+    prot_charge = []
+    pi = []
+
+    for file in glob.glob("data/training/crystal_structs/*.pdb"):
+
+        # parse the pdb file
+        p = PDB.PDBParser(QUIET=True)
+        s = p.get_structure(file, file)
+
+        PolypeptideBuilder = PPBuilder()
+
+        for pp in PolypeptideBuilder.build_peptides(s):
+            query_chain = pp.get_sequence()
+
+        protein = IP(query_chain)
+
+        prot_charge.append(protein.charge_at_pH(7.0))
+        pi.append(protein.pi())
+
+    return prot_charge, pi
 
 
 def compute_features(filenames, save=False):
