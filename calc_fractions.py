@@ -96,7 +96,7 @@ def get_feats(file):
             try:
                 frac_k_minus_r = aas['K']
             except:
-                frac_k_minus_r = 'NA'
+                frac_k_minus_r = 0
 
     # fraction of negatively charged residues
     negs=['D','E']
