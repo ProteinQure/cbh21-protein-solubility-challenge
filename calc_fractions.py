@@ -10,20 +10,13 @@ def get_feats(file):
     betas=['B','E']
 
     p = PDB.PDBParser(QUIET=True)
-    structure = p.get_structure(file, file)
 
     dssp_tuple = dssp_dict_from_pdb_file(file)
     dssp_dict = dssp_tuple[0]
 
-
-    #dssp = DSSP(model, "data/training/crystal_structs/A0A140NA.pdb")
-    # DSSP data is accessed by a tuple (chain_id, res_id)
-    #a_key = list(dssp_dict.keys())[2]
-
     all_residues = list(dssp_dict.keys())
 
-    dssp_info = [dssp_dict[i] for i in all_residues]
-
+    # get total fraction of alpha and beta
     alph_frac=0
     bet_frac=0
     for amino_acid in all_residues:
