@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
 import sys
+import argparse
+import temppathlib
+import zipfile
+import os
 from scipy.stats import spearmanr, pearsonr
 
 from sklearn.metrics import mean_absolute_error
@@ -55,6 +59,7 @@ def compute_metrics(predictions_file: str, target_files: dict[str, str]) -> dict
 
     return metrics
 """
+"""
 y_true = pd.read_csv('True.csv', index_col=False)
 y_pred = pd.read_csv('predictions.csv', index_col=False)
 
@@ -77,6 +82,22 @@ pec = pearsonr(x=y_true,y=y_pred)
 print(rmse)
 print(spr)
 print(pec)
+"""
+parser = argparse.ArgumentParser()
+parser.add_argument("--infile", type=str, default="data/test.zip")
+args = parser.parse_args()
+print(args)
 
+protein_names = []
+
+with temppathlib.TemporaryDirectory() as tmpdir:
+        # unzip the file with all the test PDBs
+        with zipfile.ZipFile(args.infile, "r") as zip_:
+            zip_.extractall(tmpdir.path)
+            for test_pdb in tmpdir.path.glob("*.pdb"):
+              filename = os.path.basename(test_pdb)
+              protein_names.append(str(filename)[:-4])
+
+print(protein_names)
 #1123.7541
 #32 = old RMSE

@@ -1,102 +1,179 @@
-"""
-The entry point for your prediction algorithm.
-"""
-
-from __future__ import annotations
-import argparse
-import csv
-import itertools
-from pathlib import Path
-import pprint
-from typing import Any
-import zipfile
-
-from Bio.PDB.PDBParser import PDBParser
-from Bio.PDB.ResidueDepth import get_surface
-from Bio.PDB.vectors import calc_dihedral
-from Bio.PDB.Structure import Structure
+import Bio
+import os
+import numpy as np
+import pandas as pd
 import temppathlib
+import zipfile
+import argparse
+from Bio.PDB import *
+from Bio.PDB import PDBParser
+from Bio.PDB.DSSP import DSSP
+from Bio.PDB.DSSP import dssp_dict_from_pdb_file
+from Bio import SeqIO
+from Bio.SeqUtils.ProtParam import ProteinAnalysis
+import freesasa
+from Bio import PDB
+import pickle
 
 
-def predict(pdb_file: Path) -> float:
-    """
-    The function that puts it all together: parsing the PDB file, generating
-    features from it and performing inference with the ML model.
-    """
+def get_area_classes(file):
+    struct = freesasa.Structure(file)
+    result = freesasa.calc(struct)
+    area_classes = freesasa.classifyResults(result,struct)
+    list_areas = [(list(area_classes.values())[0]),
+                  (list(area_classes.values())[1]),
+                  result.totalArea()]
+    return list_areas
+    #dict = {"polar":"value", "Apolar":"Value"}
+"""
+def get_seq(pdbfile):
+    file = str(pdbfile)
+    p = PDBParser(PERMISSIVE=0)
+    structure = p.get_structure(file[-3], pdbfile)
+    ppb = PPBuilder()
+    seq = ''
+    for pp in ppb.build_peptides(structure):
+        seq += pp.get_sequence()
+    return seq
+"""
+#parser=PDBParser()
 
-    # parse PDB
-    parser = PDBParser()
-    structure = parser.get_structure(pdb_file.stem, pdb_file)
+amino_acids = ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y']
 
-    # featurize + perform inference
-    features = featurize(structure)
-    predicted_solubility = ml_inference(features)
+list_lists = []
 
-    return predicted_solubility
+d_count = {}
+for i in amino_acids:
+    d_count["count_{0}".format(i)] = []
+d_perc = {}
+for j in amino_acids:
+    d_perc["perc_{0}".format(j)] = []
 
+p_len = [] #length of protein
+smell = [] #aromaticity
+taste_factor = [] # < 0 = hydrophilic, > 0 = hydrophobic -> gravy
+mol_w = [] #molecular weight
+iso_p = [] #isoelectric point
+insta_ind = [] #under 40 = stable (ish)
+helter_skeler = [] #helices
+turnip = [] #turns
+garfield = [] #sheets
+polar_area = [] #polar surface area
+apolar_area = [] #apolar surface area
+total_area = [] #total surface area
+char_at_acid = []
+char_at_neutral = []
+char_at_base = []
 
-def featurize(structure: Structure) -> list[Any]:
-    """
-    Calculates 3D ML features from the `structure`.
-    """
+parser = argparse.ArgumentParser()
+parser.add_argument("--infile", type=str, default="data/test.zip")
+args = parser.parse_args()
 
-    # get all the residues
-    residues = [res for res in structure.get_residues()]
+#protein_parser = PDBParser()
 
-    # calculate some random 3D features (you should be smarter here!)
-    protein_length = residues[1]["CA"] - residues[-2]["CA"]
-    angle = calc_dihedral(
-        residues[1]["CA"].get_vector(),
-        residues[2]["CA"].get_vector(),
-        residues[-3]["CA"].get_vector(),
-        residues[-2]["CA"].get_vector(),
-    )
-    # create the feature vector
-    features = [protein_length, angle]
+with temppathlib.TemporaryDirectory() as tmpdir:
+    # unzip the file with all the test PDBs
+    with zipfile.ZipFile(args.infile, "r") as zip_:
+        zip_.extractall(tmpdir.path)
+        for test_pdb in tmpdir.path.glob("*.pdb"):
+            struct = freesasa.Structure(str(test_pdb))
+            result = freesasa.calc(struct)
+            areas_classes = freesasa.classifyResults(result,struct)
+            list_areas = [(list(areas_classes.values())[0]),
+                          (list(areas_classes.values())[1]),
+                          result.totalArea()]
 
-    return features
+            polar_area.append(list_areas[0])
+            apolar_area.append(list_areas[1])
+            total_area.append(list_areas[2])
 
-
-def ml_inference(features: list[Any]) -> float:
-    """
-    This would be a function where you normalize/standardize your features and
-    then feed them to your trained ML model (which you would load from a file).
-    """
-
-    # this is my stupid manual ML model
-    if features[0] > 15.0 and features[1] > 0.5:
-        return 60
-    elif features[0] > 30.0 and features[1] > 1.5:
-        return 80
-
-    return 20
-
-
-if __name__ == "__main__":
-
-    # set up argument parsing
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--infile", type=str, default="data/test.zip")
-    args = parser.parse_args()
-
-    predictions = []
-    # use a temporary directory so we don't pollute our repo
-    with temppathlib.TemporaryDirectory() as tmpdir:
+print('done')
+with temppathlib.TemporaryDirectory() as tmpdir:
         # unzip the file with all the test PDBs
         with zipfile.ZipFile(args.infile, "r") as zip_:
             zip_.extractall(tmpdir.path)
 
-        # iterate over all test PDBs and generate predictions
-        for test_pdb in tmpdir.path.glob("*.pdb"):
-            predictions.append({"protein": test_pdb.stem, "solubility": predict(test_pdb)})
+            for test_pdb in tmpdir.path.glob("*.pdb"):
+                for record in SeqIO.parse(test_pdb, "pdb-atom"):
+                    sequence = str(record.seq).replace('X', 'G')
+                    protein = ProteinAnalysis(str(sequence))
+                    p_len.append(len(sequence))
+                    mol_w.append(protein.molecular_weight())
+                    iso_p.append(protein.isoelectric_point())
+                    smell.append(protein.aromaticity())
+                    taste_factor.append(protein.gravy())
+                    insta_ind.append(protein.instability_index())
+                    char_at_acid.append(protein.charge_at_pH(1))
+                    char_at_neutral.append(protein.charge_at_pH(7))
+                    char_at_base.append(protein.charge_at_pH(14))
+                    helter_skeler.append(protein.secondary_structure_fraction()[0])
+                    turnip.append(protein.secondary_structure_fraction()[1])
+                    garfield.append(protein.secondary_structure_fraction()[2])
+                    for x in amino_acids:
+                        n = protein.count_amino_acids()[x]
+                        for y in d_count.keys():
+                            if y[-1] == x:
+                                d_count[y].append(n)
+                    for a in amino_acids:
+                        m = protein.get_amino_acids_percent()[a]
+                        for b in d_perc.keys():
+                            if b[-1] == a:
+                                d_perc[b].append(m)
+                #areas = get_area_classes(test_pdb)
+                #polar_area.append(areas[0])
+                #apolar_area.append(areas[1])
+                #total_area.append(areas[2])
+print('done')
 
-    # save to csv file, this will be used for benchmarking
-    outpath = "predictions.csv"
-    with open(outpath, "w") as fh:
-        writer = csv.DictWriter(fh, fieldnames=["protein", "solubility"])
-        writer.writeheader()
-        writer.writerows(predictions)
+for values_count in d_count.values():
+    list_lists.append(list(values_count))
+for values_count in d_perc.values():
+    list_lists.append(list(values_count))
+list_lists.append(p_len)
+list_lists.append(smell)
+list_lists.append(taste_factor)
+list_lists.append(mol_w)
+list_lists.append(iso_p)
+list_lists.append(char_at_acid)
+list_lists.append(char_at_neutral)
+list_lists.append(char_at_base)
+list_lists.append(insta_ind)
+list_lists.append(helter_skeler)
+list_lists.append(turnip)
+list_lists.append(garfield)
+list_lists.append(polar_area)
+list_lists.append(apolar_area)
+list_lists.append(total_area)
 
-    # print predictions to screen
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(predictions)
+df = pd.DataFrame(list_lists)
+df = df.transpose()
+df.reset_index(drop=True, inplace=True)
+print(df)
+
+df.to_csv('features_from_zip.csv', index=False)
+
+continuous_data = df.columns.tolist()
+
+print(continuous_data)
+
+x_test = pd.read_csv('features_from_zip.csv')
+print(x_test)
+
+protein_names = []
+
+with temppathlib.TemporaryDirectory() as tmpdir:
+        # unzip the file with all the test PDBs
+        with zipfile.ZipFile(args.infile, "r") as zip_:
+            zip_.extractall(tmpdir.path)
+            for test_pdb in tmpdir.path.glob("*.pdb"):
+              filename = os.path.basename(test_pdb)
+              protein_names.append(str(filename)[:-4])
+
+print(protein_names)
+
+with open('model.pkl', 'rb') as f:
+    estimator = pickle.load(f)
+    print(estimator)
+    predictions = estimator.predict(x_test)
+    print(predictions)
+    y_pred = pd.DataFrame(list(zip(protein_names,predictions)), columns=['protein','solubility']).to_csv('predictions.csv', index=False, header=True)

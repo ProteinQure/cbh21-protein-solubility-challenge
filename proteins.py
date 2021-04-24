@@ -23,22 +23,27 @@ def get_area_classes(file):
     #dict = {"polar":"value", "Apolar":"Value"}
 
 def get_seq(pdbfile):
- p = PDBParser(PERMISSIVE=0)
- structure = p.get_structure('test', pdbfile)
- ppb = PPBuilder()
- seq = ''
- for pp in ppb.build_peptides(structure):
-  seq += pp.get_sequence()
+    file = str(pdbfile)
+    p = PDBParser(PERMISSIVE=0)
+    structure = p.get_structure(file[-3], pdbfile)
+    ppb = PPBuilder()
+    seq = ''
+    for pp in ppb.build_peptides(structure):
+        seq += pp.get_sequence()
+    return seq
 
- return seq
+parser=PDBParser()
 
+amino_acids = ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y']
+
+"""
 path  = "C:\\Users\\Kai Armstrong\\PycharmProjects\git_proj\\cbh21-protein-solubility-challenge\\data\\training\\crystal_structs"
 
 os.chdir(path)
 #solubility_values_df = pd.read_csv('solubility_values.csv')
 
 
-parser=PDBParser()
+
 
 amino_acids = ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y']
 
@@ -336,7 +341,7 @@ os.chdir("C:\\Users\\Kai Armstrong\\PycharmProjects\\git_proj\\cbh21-protein-sol
 df = pd.DataFrame(list_lists)
 df = df.transpose()
 df.to_csv('yeast_crystal.csv', index=False)
-
+"""
 ################################################################
 
 path  = "C:\\Users\\Kai Armstrong\\PycharmProjects\git_proj\\cbh21-protein-solubility-challenge\\data\\test\\yeast_modelled_structs"
@@ -380,10 +385,10 @@ for entry in os.listdir(path):
 for entry in os.listdir(path):
     if os.path.isfile(os.path.join(path, entry)):
         if entry.endswith('.pdb'):
-            #for record in SeqIO.parse(entry, "pdb-atom"):
+            for record in SeqIO.parse(entry, "pdb-atom"):
 
                 #structure = parser.get_structure(entry)
-                sequence = get_seq(entry)
+                sequence = str(record.seq).replace('X', 'G')
                 protein = ProteinAnalysis(str(sequence))
                 p_len.append(len(sequence))
                 mol_w.append(protein.molecular_weight())
