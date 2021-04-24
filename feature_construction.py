@@ -3,6 +3,7 @@ import Bio.PDB as PDB
 import Bio.PDB.DSSP as DSSP 
 import glob
 import numpy as np
+import pandas as pd
 
 def calc_length(filenames):
 
@@ -117,7 +118,7 @@ def ss_depth(filenames):
     return frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list
 
 
-def compute_features(filenames):
+def compute_features(filenames, save=False):
     """"Takes list of pdb filenames as input and returns list of features"""
 
     ###### Protein IDs
@@ -142,12 +143,24 @@ def compute_features(filenames):
     # Save features in file to pass to R script
     print("Saving features")
     arr = np.column_stack((protIDs, surfaces, prot_lengths, surface_seq, frac_mod_beta_list, frac_mod_alfa_list, frac_exp_alfa_list))
+    df = pd.DataFrame({'protIDs': protIDs, 
+        'surfaces': surfaces,
+        'prot_lengths': prot_lengths,
+        'surface_seq': surface_seq,
+        'frac_mod_beta_list': frac_mod_beta_list,
+        'frac_mod_alfa_list': frac_mod_alfa_list,
+        'frac_exp_alfa_list': frac_exp_alfa_list})
 
-    print(arr)
-    np.savetxt("features.csv", arr, delimiter=",")
+    if save:
+        # np.savetxt("features.csv", arr, delimiter=",")
+        # np.save('features.npy', arr, allow_pickle=True, fix_imports=True)
+        df.to_csv('features.csv', index=False)
+        
+    else: 
+        return df
 
 
 if __name__ == "__main__":
     filenames = glob.glob("data/training/crystal_structs/*.pdb")
 
-    compute_features(filenames)
+    compute_features(filenames, save=True)
