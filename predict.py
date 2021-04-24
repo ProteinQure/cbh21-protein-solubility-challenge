@@ -17,6 +17,9 @@ from Bio.PDB.vectors import calc_dihedral
 from Bio.PDB.Structure import Structure
 import temppathlib
 
+import pickle
+from feature_construction import compute_features
+
 
 def predict(pdb_file: Path) -> float:
     """
@@ -24,52 +27,62 @@ def predict(pdb_file: Path) -> float:
     features from it and performing inference with the ML model.
     """
 
-    # parse PDB
-    parser = PDBParser()
-    structure = parser.get_structure(pdb_file.stem, pdb_file)
+    # # parse PDB
+    # parser = PDBParser()
+    # structure = parser.get_structure(pdb_file.stem, pdb_file)
 
-    # featurize + perform inference
-    features = featurize(structure)
-    predicted_solubility = ml_inference(features)
+    # # featurize + perform inference
+    # features = featurize(structure)
+    # predicted_solubility = ml_inference(features)
+
+    # Load from file
+    with open('pickle_model.pkl', 'rb') as file:
+        rfr = pickle.load(file)
+
+    print(pdb_file)
+    features = compute_features([str(pdb_file)])
+    XTest = features.iloc[:, 1:].to_numpy()
+
+    predicted_solubility = rfr.predict(XTest)[0]
 
     return predicted_solubility
 
 
-def featurize(structure: Structure) -> list[Any]:
-    """
-    Calculates 3D ML features from the `structure`.
-    """
+# def featurize(structure: Structure) -> list[Any]:
+#     """
+#     Calculates 3D ML features from the `structure`.
+#     """
 
-    # get all the residues
-    residues = [res for res in structure.get_residues()]
+#     # get all the residues
+#     residues = [res for res in structure.get_residues()]
 
-    # calculate some random 3D features (you should be smarter here!)
-    protein_length = residues[1]["CA"] - residues[-2]["CA"]
-    angle = calc_dihedral(
-        residues[1]["CA"].get_vector(),
-        residues[2]["CA"].get_vector(),
-        residues[-3]["CA"].get_vector(),
-        residues[-2]["CA"].get_vector(),
-    )
-    # create the feature vector
-    features = [protein_length, angle]
+#     # calculate some random 3D features (you should be smarter here!)
+#     protein_length = residues[1]["CA"] - residues[-2]["CA"]
+#     angle = calc_dihedral(
+#         residues[1]["CA"].get_vector(),
+#         residues[2]["CA"].get_vector(),
+#         residues[-3]["CA"].get_vector(),
+#         residues[-2]["CA"].get_vector(),
+#     )
+#     # create the feature vector
+#     features = [protein_length, angle]
 
-    return features
+#     return features
 
 
-def ml_inference(features: list[Any]) -> float:
-    """
-    This would be a function where you normalize/standardize your features and
-    then feed them to your trained ML model (which you would load from a file).
-    """
+# def ml_inference(features: list[Any]) -> float:
+#     """
+#     This would be a function where you normalize/standardize your features and
+#     then feed them to your trained ML model (which you would load from a file).
+#     """
 
-    # this is my stupid manual ML model
-    if features[0] > 15.0 and features[1] > 0.5:
-        return 60
-    elif features[0] > 30.0 and features[1] > 1.5:
-        return 80
+#     # this is my stupid manual ML model
+#     if features[0] > 15.0 and features[1] > 0.5:
+#         return 60
+#     elif features[0] > 30.0 and features[1] > 1.5:
+#         return 80
 
-    return 20
+#     return 20
 
 
 if __name__ == "__main__":
