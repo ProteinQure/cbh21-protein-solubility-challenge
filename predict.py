@@ -67,6 +67,7 @@ char_at_base = []
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--infile", type=str, default="data/test.zip")
+parser.add_argument("--model", type=str, default="model.pkl")
 args = parser.parse_args()
 
 #protein_parser = PDBParser()
@@ -171,7 +172,7 @@ with temppathlib.TemporaryDirectory() as tmpdir:
 
 print(protein_names)
 
-with open('model.pkl', 'rb') as f:
+with open(args.model, 'rb') as f:
     estimator = pickle.load(f)
     print(estimator)
     predictions = estimator.predict(x_test)
