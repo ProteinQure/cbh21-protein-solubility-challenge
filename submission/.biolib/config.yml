@@ -12,8 +12,8 @@ modules:
             - COPY / /home/biolib/
 arguments:
     -
-        default_value: 'sequences.fasta'
-        description: Sequence Input (.fasta)
+        default_value: "data/test.zip"
+        description: Zip of pdb files
         key: '--infile'
         key_value_separator: ' '
         required: true
